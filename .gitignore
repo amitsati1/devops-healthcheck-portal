@@ -1,0 +1,20 @@
+# Python cache
+__pycache__/
+*.pyc
+
+
+#Node module
+node_modules/
+
+
+#Docker Artifacts
+*.log
+*.env
+
+#Terraform
+*.tfstate
+*.tfstate.backup
+*terraform/
+
+# VS Code
+.vscode/
