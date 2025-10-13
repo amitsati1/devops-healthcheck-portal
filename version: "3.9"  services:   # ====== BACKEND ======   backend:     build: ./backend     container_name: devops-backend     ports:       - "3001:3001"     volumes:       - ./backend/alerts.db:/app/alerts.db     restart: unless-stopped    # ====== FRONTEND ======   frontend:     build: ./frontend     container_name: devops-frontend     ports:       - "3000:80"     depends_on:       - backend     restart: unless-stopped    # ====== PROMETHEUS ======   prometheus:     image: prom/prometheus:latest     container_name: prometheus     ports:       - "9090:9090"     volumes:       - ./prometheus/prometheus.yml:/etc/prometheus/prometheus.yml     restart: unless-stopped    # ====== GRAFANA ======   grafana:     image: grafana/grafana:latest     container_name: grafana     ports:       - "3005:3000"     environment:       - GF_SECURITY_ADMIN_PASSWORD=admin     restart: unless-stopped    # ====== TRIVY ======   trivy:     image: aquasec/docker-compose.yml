@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  # ====== BACKEND ======
+  backend:
+    build: ./backend
+    container_name: devops-backend
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./backend/alerts.db:/app/alerts.db
+    restart: unless-stopped
+
+  # ====== FRONTEND ======
+  frontend:
+    build: ./frontend
+    container_name: devops-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # ====== PROMETHEUS ======
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    restart: unless-stopped
+
+  # ====== GRAFANA ======
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3005:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    restart: unless-stopped
+
+  # ====== TRIVY ======
+  trivy:
+    image: aquasec/trivy:latest
+    container_name: trivy
+    entrypoint: ["sleep", "infinity"] # keeps Trivy container alive
+    restart: unless-stopped
+
+  # ====== SONARQUBE ======
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    environment:
+      - SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true
+    ports:
+      - "9000:9000"
+    restart: unless-stopped
